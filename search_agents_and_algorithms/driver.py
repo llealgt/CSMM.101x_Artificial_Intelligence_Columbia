@@ -1,6 +1,6 @@
 import sys
 import math
-from Node import Node
+from search_problem import SearchProblem
 
 if __name__ == '__main__':
     
@@ -17,17 +17,17 @@ if __name__ == '__main__':
         sys.exit(0)
     
     #create the root node with the given board(initial state)
-    root_node =  Node(state=board)
+    searchProblem = SearchProblem(initialState = board)
     
     #perform the selected method
     if method == 'bfs':
-        print('bfs')
+        searchProblem.breadth_first_search()
     elif method == 'dfs':
-        print('dfs')
+        searchProblem.depth_first_search()
     elif method == 'ast':
-        print('ast')
+        searchProblem.a_star()
     elif method == 'ida':
-        print('ida')
+        searchProblem.iterative_deepening_a_star()
     else:
         print('Not valid method selected')
     
