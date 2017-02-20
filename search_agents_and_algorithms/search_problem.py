@@ -14,25 +14,35 @@ class SearchProblem:
     def __init__(self,initialState = []):
         self.rootNode = Node(state = initialState )
         self.size = int(math.sqrt(len(initialState)))
+        self.frontier_hash = dict() #auxiliary hash table to know which nodes are already in the frontier
 
     def breadth_first_search(self):
         print("bfs")
         self.frontier = deque()
         self.frontier.append(self.rootNode)
+        self.frontier_hash[self.rootNode.hash] = True
         
         #TODO:code to expand node and get its neighbors is still mising
         while len(self.frontier) > 0:
             node = self.frontier.popleft()
+        
+            if self.is_goal(state = node.state):
+                print "solution found" 
+                self.get_problem_solution(node)
+                return
+            
+                
+            self.generate_node_neighbors(node)           
             
             node.visited = True
-            
-            if self.is_goal(state = node.state):
-                self.get_problem_solution(node)
                 
             for neighbor in node.neighbors:
                 
-                if not neighbor.visited: 
-                    print "neighbor"
+                if not neighbor.visited and not self.frontier_hash.get(neighbor.hash): 
+                    self.frontier.append(neighbor)
+                    self.frontier_hash[neighbor.hash] = True
+        
+        print "No solution found"
                 
 
     def depth_first_search(self):
@@ -95,7 +105,7 @@ class SearchProblem:
         state[(zero_row+row_index)*self.size + zero_col + col_index] = 0
         state[zero_row*self.size + zero_col] = temp_value
             
-        child = Node(parent = parent, state = state ,zero_position=(zero_row+row_index)*self.size + zero_col + col_index)
+        child = Node(parent = parent, state = state)
         
         return child
         
@@ -108,3 +118,28 @@ class SearchProblem:
     def get_element_col(self,element = 0):
         
         return element%self.size
+        
+    #generate a list of a node neighbors for a node
+    def generate_node_neighbors(self,parent):
+
+        #make sure no duplicate neighbors are generated yet
+        if len(parent.neighbors) > 0 :
+            return
+        
+        auxiliar_node = self.child_node(parent,"up")        
+        if auxiliar_node  is not None:
+            parent.neighbors.append(auxiliar_node)
+            
+        auxiliar_node = self.child_node(parent,"down")
+        if auxiliar_node is not None:
+            parent.neighbors.append(auxiliar_node)
+            
+        auxiliar_node = self.child_node(parent,"left")
+        if auxiliar_node is not None:
+            parent.neighbors.append(auxiliar_node)
+            
+        auxiliar_node = self.child_node(parent,"right")    
+        if auxiliar_node is not None:
+            parent.neighbors.append(auxiliar_node)
+        
+            
