@@ -47,6 +47,31 @@ class SearchProblem:
 
     def depth_first_search(self):
         print("dfs")
+        self.frontier = deque()
+        self.frontier.append(self.rootNode)
+        self.frontier_hash[self.rootNode.hash] = True
+
+        while len(self.frontier) > 0 :
+            node = self.frontier.pop()
+            
+            if self.is_goal(state = node.state):
+                print "Solution found"
+                self.get_problem_solution(node)
+                return
+                
+            self.generate_node_neighbors(node)
+            
+            node.visited = True
+            
+            while len(node.neighbors) > 0:
+                
+                neighbor = node.neighbors.pop()
+                
+                if not neighbor.visited and not self.frontier_hash.get(neighbor.hash):
+                    self.frontier.append(neighbor)
+                    self.frontier_hash[neighbor.hash] = True
+
+        print "No solution found"
 
     def a_star(self):
         print("A star")      
