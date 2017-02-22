@@ -79,11 +79,19 @@ class SearchProblem:
     def iterative_deepening_a_star(self):
         print("ida")
         
+    #given a state representing the current board, evaluate if its a goal state
     def is_goal(self,state=[]):
         
-        for index,value in enumerate(state):
-            if index != value:
-                return False
+        previous_value = state[0]
+
+        for index in range(1,len(state)):
+            current_value = state[index]
+            if current_value != 0:
+                
+                if previous_value > current_value:
+                    return False
+                
+                previous_value = current_value
         
         return True
         
