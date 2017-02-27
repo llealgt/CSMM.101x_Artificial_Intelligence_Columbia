@@ -7,6 +7,7 @@ Created on Sun Feb  5 23:05:23 2017
 
 from Node import Node
 from collections import deque
+import heapq
 import math
 
 class SearchProblem:
@@ -73,8 +74,33 @@ class SearchProblem:
 
         print "No solution found"
 
+    #the first version is is still not a* because is not considering cost, only heuristic(greedy search)
     def a_star(self):
-        print("A star")      
+        print("A star")
+        
+        root_heuristic = self.calc_manhatan_heuristic(self.rootNode.state)
+        self.frontier = [(root_heuristic,self.rootNode)] #manage as a heap by priority given by the heuristic
+        self.frontier_hash[self.rootNode.hash] = True
+                          
+        while len(self.frontier) > 0:
+            node = heapq.heappop(self.frontier)[1]
+            node.visited = True
+        
+            if self.is_goal(state = node.state):
+                print "Solution found"
+                self.get_problem_solution(node)
+                return
+            
+            self.generate_node_neighborserate_node_neighbors(node)
+            
+            for neighbor in node.neighbors:
+                if not neighbor.visited and not self.frontier_hash.get(neighbor.hash):
+                    neighbor_heuristic = self.calc_manhatan_heuristic(neighbor.state)
+                    heapq.heappush(self.frontier,(neighbor_heuristic,neighbor))
+                    self.frontier_hash[neighbor.hash] = True
+                                      
+        print "No solution found"
+                
         
     def iterative_deepening_a_star(self):
         print("ida")
@@ -175,4 +201,24 @@ class SearchProblem:
         if auxiliar_node is not None:
             parent.neighbors.append(auxiliar_node)
         
+    #The manhatan heuristic(sum of distance from the tiles from their goal)
+    def calc_manhatan_heuristic(self,state=[]):
+        manhatan_heuristic = 0
+        
+        for index,tile in enumerate(state):
+            
+            if tile != 0: #0 the empty space is not a tile
+                #get what the goal position of the tile is
+                correct_row = self.get_element_row(tile)
+                correct_col = self.get_element_col(tile)
+                
+                #get what the current position of the tile is
+                current_row = self.get_element_row(index)
+                current_col = self.get_element_col(index)
+            
+                #manhatan distance for the tile is how far it is from the goal position
+                tile_distance = abs(correct_row-current_row) + abs(correct_col - current_col)
+                manhatan_heuristic = manhatan_heuristic+=tile_distance
+            
+        return manhatan_heuristic
             
