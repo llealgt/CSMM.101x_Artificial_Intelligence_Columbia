@@ -91,7 +91,7 @@ class SearchProblem:
                 self.get_problem_solution(node)
                 return
             
-            self.generate_node_neighborserate_node_neighbors(node)
+            self.generate_node_neighbors(node)
             
             for neighbor in node.neighbors:
                 if not neighbor.visited and not self.frontier_hash.get(neighbor.hash):
@@ -218,7 +218,7 @@ class SearchProblem:
             
                 #manhatan distance for the tile is how far it is from the goal position
                 tile_distance = abs(correct_row-current_row) + abs(correct_col - current_col)
-                manhatan_heuristic = manhatan_heuristic+=tile_distance
+                manhatan_heuristic+=tile_distance
             
         return manhatan_heuristic
             
