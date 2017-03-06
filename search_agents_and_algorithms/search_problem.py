@@ -26,7 +26,8 @@ class SearchProblem:
         #TODO:code to expand node and get its neighbors is still mising
         while len(self.frontier) > 0:
             node = self.frontier.popleft()
-        
+            del self.frontier_hash[node.hash]
+            
             if self.is_goal(state = node.state):
                 print "solution found" 
                 self.get_problem_solution(node)
@@ -54,6 +55,7 @@ class SearchProblem:
 
         while len(self.frontier) > 0 :
             node = self.frontier.pop()
+            del self.frontier_hash[node.hash]
             
             if self.is_goal(state = node.state):
                 print "Solution found"
@@ -81,9 +83,14 @@ class SearchProblem:
         root_heuristic = self.calc_manhatan_heuristic(self.rootNode.state)
         self.frontier = [(root_heuristic,self.rootNode)] #manage as a heap by priority given by the heuristic
         self.frontier_hash[self.rootNode.hash] = True
-                          
+        print "Initial state " + str(self.rootNode.state) +" with heuristic " +str(root_heuristic)
+        print " "
+                           
         while len(self.frontier) > 0:
-            node = heapq.heappop(self.frontier)[1]
+
+            cost,node = heapq.heappop(self.frontier)
+            del self.frontier_hash[node.hash]
+            print "Processing node " + str(node.state) +" with total cost "+str(cost) +" and path cost "+str(node.path_cost)
             node.visited = True
         
             if self.is_goal(state = node.state):
@@ -95,9 +102,26 @@ class SearchProblem:
             
             for neighbor in node.neighbors:
                 if not neighbor.visited and not self.frontier_hash.get(neighbor.hash):
+                    print "    Child "+str(neighbor.state) +" added to frontier"
                     neighbor_heuristic = self.calc_manhatan_heuristic(neighbor.state)
-                    heapq.heappush(self.frontier,(neighbor_heuristic,neighbor))
+                    neighbor.path_cost = node.path_cost + 1
+                    total_cost = neighbor.path_cost + neighbor_heuristic
+                    heapq.heappush(self.frontier,(total_cost,neighbor))
                     self.frontier_hash[neighbor.hash] = True
+                elif self.frontier_hash.get(neighbor.hash):
+                    #calculate the cost to validate if is lower on the one that is in the frontier
+                    neighbor_heuristic = self.calc_manhatan_heuristic(neighbor.state)
+                    neighbor.path_cost = node.path_cost + 1
+                    total_cost = neighbor.path_cost + neighbor_heuristic
+                    
+                    #get the value that is currently on the frontier
+                    current_heap_tuple = filter(lambda element: element[1].state == neighbor.state, self.frontier)[0]
+                    
+                    #if the cost of the state in the frontier is higher than the neighbor,replace it with the lower value
+                    if current_heap_tuple > total_cost:
+                        self.frontier.remove(current_heap_tuple)
+                        heapq.heappush(self.frontier,(total_cost,neighbor))
+                    
                                       
         print "No solution found"
                 
